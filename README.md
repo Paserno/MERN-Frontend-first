@@ -60,3 +60,48 @@ export const AppRouter = () => {
 }
 ````
 ----
+### 1,5.- Login
+Se creo un formulario para Login en conjunto con el de register, ademas de crear un Navbar
+
+Pasos a Seguir:
+* Crear formulario en __LoginSreen__.
+* Crear componente __Navbar__ en `components/ui/Navbar.js`.
+* Invocar componente __Navbar__ en __CalendarScreen__.
+
+En `components/ui/Navbar.js`
+* Se crea un componente Navbar basico.
+````
+export const Navbar = () => {
+  return (
+    <div className="navbar navbar-dark bg-dark mb-4">
+        <span className="navbar-brand">
+            Diego
+        </span>
+
+        <button className="btn btn-outline-danger">
+            <i className="fas fa-sign-out-alt"></i> 
+            <span> Salir</span>
+        </button>
+        
+    </div>
+  )
+}
+````
+En `components/calendar/CalendarScreen.js`
+* Importamos el componente __Navbar__
+````
+import { Navbar } from '../ui/Navbar'
+````
+* Y invocamos el componente en el inicio.
+````
+export const CalendarScreen = () => {
+  return (
+    <div>
+      <Navbar />
+        <h1>CalendarScreen</h1>
+
+    </div>
+  )
+}
+````
+----
