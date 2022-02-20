@@ -1,70 +1,62 @@
-# Getting Started with Create React App
+# First MERN - Frontend
+Primera app MERN ( Mongo - Express - React - Node.js) utilizando las bases aprendidas para la implementación de todos estos elementos en conjuto, este repositorio será la parte del Fronend.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Elementos utilizados: 
+* __[React Router v5](https://v5.reactrouter.com/web/guides/quick-start)__
 
-## Available Scripts
 
-In the project directory, you can run:
+----
 
-### `npm start`
+Recordar que si se desea ejecutar esta aplicación, deben de reconstruir los módulos de node así:
+````
+npm install
+````
+Y luego para hacerla correr.
+````
+npm start
+````
+<br>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+----
+### 1.- Inicio del Proyecto
+En este punto se crearon algunas carpetas con sus componentes base y las primeras rutas implementadas.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Pasos a Seguir:
+* En `index.js` se importa el componente principal __AppRouter__.
+* Creación de la 📂carpeta `components/`, ademas de 3 📂carpetas hijas llamadas `components/auth`, `components/calendar` y `components/ui`.
+    * Se crea el componente __LoginScreen__ en `components/auth/LoginScreen.js`.
+    * Se crea el componente __CalendarScreen__ en `components/auth/CalendarScreen.js`.
+* Se crea la 📂carpeta `router/` donde se almacenará las rutas de la aplicación como __AppRouter__.
+* Se importa la __AppRouter__ en el componente principal __CalendarApp__.
 
-### `npm test`
+En `router/AppRouter.js`
+* Se importa los elementos de React Router v5, ademas de los dos compoentes que se craron __LoginScreen__ y __CalendarScreen__.
+````
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
+import { LoginScreen } from '../components/auth/LoginScreen';
+import { CalendarScreen } from '../components/calendar/CalendarScreen';
+````
+* Se crea las 2 rutas hacia `LoginScreen` y `CalendarScreen`, ademas de un `Redirect` en el caso que se mande una ruta desconocida.
+````
+export const AppRouter = () => {
+  return (
+    <Router>
+      <div>
+        <Switch>
+          <Route exact path="/login" component={ LoginScreen } />
+          <Route exact path="/" component={ CalendarScreen } />
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+          <Redirect to='/'/>
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+        </Switch>
+      </div>
+    </Router>
+  )
+}
+````
+----
