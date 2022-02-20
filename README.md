@@ -175,3 +175,73 @@ html, body {
 }
 ````
 ----
+### 2,5.- Configurando estilos de Calendar
+En este puntos se realizará configuraciónes de estilos del calendario.
+
+Pasos a Seguir:
+* Se crea la carpeta `helpers/`
+  * Agregamos una configuración para tener algunos elementos en el idioma español.
+* Realizamos algunas importaciones adicionales en __CalendarScreen__ para tener los elementos en español, ademas de agregar unos estilos.
+
+En `Helpers/calendar-messager-es.js`
+* Agregamos la configuración que deseamos en el idioma español.
+````
+export const messages = {
+    allDay: 'Todo el día',
+    previous: '<',
+    next: '>',
+    today: 'Hoy',
+    month: 'Mes',
+    week: 'Semana',
+    day: 'Día',
+    agenda: 'Agenda',
+    date: 'Fecha',
+    time: 'Hora',
+    event: 'Evento',
+    noEventsInRange: 'No hay eventos en este rango',
+    showMore: total => `+ Ver más (${total})`
+};
+````
+En `components/calendar/CalendarScreen.js`
+* Se agrega 2 nuevas importaciones, una configuración propia de __moment__ para cambiar el idioma y el objeto literal `messages` que se creo.
+````
+import 'moment/locale/es';
+import { messages } from '../../helpers/calendar-messager-es';
+````
+* Se implementa la configuración para cambio el idioma.
+````
+moment.locale('es');
+````
+* Se agrega una función que tendra la configuración de los estilos, ademas de retornar el estilo que se creo.
+````
+export const CalendarScreen = () => {
+
+  const eventStyleGetter = ( event, start, end, isSelected) => {
+
+    const style = {
+      backgroundColor: '#367CF7',
+      borderRadius: '0px',
+      opacity: 0.8,
+      display: 'block',
+      color: 'white'
+    }
+
+    return {
+      style
+    }
+  }
+  ...
+}
+````
+* Se agrega el `messages` que tiene los elementos en español y en `eventPropGetter={}` se implementa la función recién mostrada que retorna los estilos.
+````
+<Calendar
+        localizer={localizer}
+        events={ events }
+        startAccessor="start"
+        endAccessor="end"
+        messages={ messages }
+        eventPropGetter={ eventStyleGetter }
+      />
+````
+----
