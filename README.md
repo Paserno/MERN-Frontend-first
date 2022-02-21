@@ -6,6 +6,7 @@ Elementos utilizados:
 * __[React Big Calendar](https://www.npmjs.com/package/react-big-calendar)__
 * __[Moment.js](https://www.npmjs.com/package/moment)__ - [Page](https://momentjs.com)
 * __[React Modal](https://www.npmjs.com/package/react-modal)__
+* __[React DateTime Picker](https://www.npmjs.com/package/react-datetime-picker)__
 
 ----
 
@@ -440,5 +441,121 @@ En `styles.css`
     outline: none;
     padding: 10px;
 }
+````
+----
+### 5.- Contenido de la Pantalla Modal
+Se instala __React DateTime Picker__ para que el usuaro pueda seleccionar una fecha y hora, ademas de mostrarlo, esto se le agrega a la pantalla modal y otros input's.
+
+Pasos a Seguir:
+* Se instala __[React DateTime Picker](https://www.npmjs.com/package/react-datetime-picker)__.
+* Se agrega un formulario con diferentes input en el componente __CalendarModal__.
+  * Se adapta dos input con __React DateTime Picker__ para el manejo de fechas y se le agrega algunos estilos.
+  * Se utiliza el hook __useState__ y funciones que maneje el nuevo input.
+
+En `components/calendar/CalendarModal.js`
+* Se instala 2 nuevos elementos en el componente, __DataTimePicker__ y __moment__.
+````
+import Modal from 'react-modal';
+import DateTimePicker from 'react-datetime-picker'; 
+import moment from 'moment';
+import { useState } from 'react';
+````
+* Se utiliza moment para sacar la hora actual y agregarle una hora adicional.
+* Se clona la hora actual y se le agrega adicionalmente 1 hora.
+````
+const now = moment().minutes(0).second(0).add(1, 'hours'); 
+const oneMoreHours = now.clone().add(1, 'hours');
+````
+* Se agregan dos __useState__ para entregarle la hora actual y poder manejar las horas en el input que se mostrará a continuación.
+````
+const [dateStart, setDateStart] = useState( now.toDate() );
+const [dateEnd, setDateEnd] = useState( oneMoreHours.toDate() );
+````
+* Se crean dos funciones que hará que se pueda cambiar el estado del __useState__ de `dateStart` y `dateEnd`.
+````
+const handleStartDateChange = (e) => {
+    setDateStart( e );
+    console.log(e)
+  } 
+
+  const handleFinishDateChange = (e) => {
+    setDateEnd( e );
+    console.log(e)
+  } 
+````
+* Se agrega la estructura HTML que tendra la pantalla modal. _(En los puntos suspensivos ira otro contenido)_
+````
+<h1> Nuevo evento </h1>
+<hr />
+<form className="container">
+
+  <div className="form-group">
+    <label>Fecha y hora inicio</label>
+    
+    ....
+
+  </div>
+
+  <div className="form-group">
+    <label>Fecha y hora fin</label>
+    
+    ....
+
+  </div>
+
+  <hr />
+  <div className="form-group">
+    <label>Titulo y notas</label>
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Título del evento"
+      name="title"
+      autoComplete="off"
+    />
+    <small id="emailHelp" className="form-text text-muted">Una descripción corta</small>
+  </div>
+
+  <div className="form-group">
+    <textarea
+      type="text"
+      className="form-control"
+      placeholder="Notas"
+      rows="5"
+      name="notes"
+    ></textarea>
+    <small id="emailHelp" className="form-text text-muted">Información adicional</small>
+  </div>
+
+  <button
+    type="submit"
+    className="btn btn-outline-primary btn-block"
+  >
+    <i className="far fa-save"></i>
+    <span>  Guardar</span>
+  </button>
+
+</form>
+````
+* Los primeros puntos suspensivos ira el contenido de __DateTimePicker__ le agregamos que función hará su cambio, su useState, el formato que se mostrará la fecha e hora y su clase.  
+````
+<DateTimePicker 
+  onChange={ handleStartDateChange } 
+  value={ dateStart } 
+  format="dd-MM-y h:mm a"
+  amPmAriaLabel="Select AM/PM"
+  className="form-control"
+/>
+````
+* Agregamos todo igual al punto anterior, pero adicionalmente se usa `minDate` que es propio de __DateTimePicker__, esto hará que nunca se tenga una hora inferior a su dependencia en este caso el useState `dateStart`.
+````
+<DateTimePicker 
+  onChange={ handleFinishDateChange } 
+  value={ dateEnd } 
+  format="dd-MM-y h:mm a"
+  amPmAriaLabel="Select AM/PM"
+  minDate={ dateStart }
+  className="form-control"
+/>
 ````
 ----

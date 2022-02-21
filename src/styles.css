@@ -56,3 +56,16 @@ html, body {
     outline: none;
     padding: 10px;
 }
+
+/*  DatePicker */
+
+.react-datetime-picker input:focus {
+    color: #495057;
+    border-color: #80dbff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+}
+
+.react-datetime-picker__wrapper {
+    border: 0px solid #495057 !important;
+}
