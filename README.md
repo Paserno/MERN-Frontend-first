@@ -1000,4 +1000,36 @@ const onSelectEvent = (e) => {
 <AddNewFab />
 ````
 ----
+### 9,5.- Añadir un Evento al Redux
+Se agrega una funcionalidad adicional al botón de guardar del componente modal, este hará que se guarde en un estado global el contenido del formulario.
 
+Pasos a Seguir:
+* Implementar nuevo case en `calendarReducer`.
+* Implementar dispatch al botón guardar del componente __CalendarModal__.
+
+En `reducers/calendarReducrer.js`
+* Se agrega el nuevo case de `eventAddNew`, conservando el estado con el operador spread, en el `events` se conserva el contenido que se tenga y ademas agregar el contenido que se agregue al payload.
+````
+case types.eventAddNew:
+  return {
+    ...state,
+    events: [ ...state.events, action.payload]
+  }
+````
+En `components/calendar/CalendarModal.js`
+* Se importa la acción `eventAddNew`.
+````
+import { eventAddNew } from '../../actions/events';
+````
+* En la función `handleSubmitForm` se agrega el dispatch del evento `eventAddNew`, que se le pasa un objeto, el cual es el contenido de estado del formulario, ademas de una id temporal y un `user`, esto proximamente estará enlazado a un __backend__ que proporcionará el user, entre otros elementos.
+````
+dispatch(eventAddNew({
+  ...formValues,
+  id: new Date().getTime(),
+  user: {
+    _id: '123',
+    name: 'Diego'
+  }
+}))
+````
+----
