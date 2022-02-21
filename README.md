@@ -245,3 +245,84 @@ export const CalendarScreen = () => {
       />
 ````
 ----
+### 3.- Componente de evento - eventos en CalendarScreen
+Se creará un componentne nuevo llamado __CalendarEvent__, ademas se agregan algunos eventos nuevos en el componente __CalendarScreen__.
+
+Pasos a Seguir:
+* Se crea el nuevo componente __CalendarEvent__, para personalizar los bloques del calendarios.
+* Creamos funciones donde se manejaran los eventos.
+  * Se crea un evento para el manejo de __localStorage__, para guardar la ultima vista.
+
+En `components/calendar/CalendarEvent.js`
+* Se crea el componente que recibirá por parametros `event`.
+* Desestructuramos el title y user de los `event`.
+* Retornamos en el componente el titulo y el nombre.
+````
+export const CalendarEvent = ({ event }) => {
+
+    const { title, user } = event;
+
+  return (
+    <div>
+        <strong> { title } </strong>
+        <span>- { user.name } </span>
+    </div>
+  )
+}
+````
+En `components/calendar/CalendarScreen.js`
+* Importamos dos nuevos elementos en el componente, __CalendarEvent__ y __useState__ de React.
+````
+import { CalendarEvent } from './CalendarEvent';
+import { useState } from 'react';
+````
+* Agregamos al evento ejemplo la propiedad `user` con el id y nombre.
+````
+const events = [{
+  title: 'Cumpleaños',
+  start: moment().toDate(), // new Date
+  end: moment().add( 2, 'hours').toDate(),
+  bgcolor: '#fafafa',
+  notes: 'Buscar a manuel',
+  user: {
+    _id: '123',
+    name: 'Diego'
+  }
+}]
+````
+* Se agrega un estado, donde recibirá el __localStorage__, en el caso que no haya nada ahí, se mandara `month`, esto lo que manejará es la ultima vista en la aplicación.
+````
+const [lastView, setLastView] = useState( localStorage.getItem('lastView') || 'month' )
+````
+* Creamos los diferentes eventos que se usaran.
+  * evento de doble clic para la futura edición.
+  * evento select para eliminarlo en el futuro.
+  * Y el evento que se implemento es de mandar la ultima vista al __localStorage__.
+````
+const onDobleClick = (e) => {
+    console.log(e);
+  }
+
+  const onSelectEvent = (e) => {
+    console.log(e);
+  }
+
+  const onViewChange = (e) => {
+    setLastView(e);
+    localStorage.setItem('lastView', e);
+  }
+````
+* Agregamos los ultimos eventos, ademas del nuevo componente personalizado __CalendarEvent__.
+````
+<Calendar
+  ...
+  onDoubleClickEvent={ onDobleClick }
+  onSelectEvent={ onSelectEvent }
+  onView={ onViewChange }
+  view={ lastView }
+  components={{
+    event: CalendarEvent
+  }}
+/>
+````
+----
