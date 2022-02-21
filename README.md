@@ -780,3 +780,84 @@ export const store = createStore(
 )
 ````
 ----
+### 8.- Ocultar y Mostrar Componente Modal
+En este punto se hará el uso de los estados de Redux para mostrar y ocultar el componente que tiene el formulario modular.
+
+Paso a Seguir:
+* Agregar un nuevo case en `uiReducer`.
+* Crear acciones que seran disparados.
+* Implementar el useDispatch y useSelect de React Redux en el componente __CalendarScreen__ y __CalendarModal__.
+
+En `reducers/uiReducer.js`
+* Se agrega la opción de cambiar el estado de `modalOpen` que servirá para cerrar el componente __CalendarModal__.
+````
+case types.uiCloseModal:
+  return {
+      ...state,
+      modalOpen: false
+  }
+````
+En `actions/ui.js`
+* Imprtamos los tipos.
+````
+import { types } from "../types/types";
+````
+* Creamos dos acciones sincrona que serán disparados en los componentes.
+````
+export const uiOpenModal = () => ({
+    type: types.uiOpenModal
+});
+
+export const uiCloseModal = () => ({
+    type: types.uiCloseModal
+});
+````
+En `components/calendar/CalendarScreen.js`
+* Se importa el CustomHook de __React Redux__ y  la acción que se usará.
+````
+import { useDispatch } from 'react-redux';
+...
+import { uiOpenModal } from '../../actions/ui';
+````
+* Implementamos el `useDispatch`
+````
+const dispatch = useDispatch();
+````
+* Se agrega en la función de doble clic el dispatch que activa la acción que abra la pantalla modal. (cambiando el estado de `modalOpen` en `true`)
+````
+const onDobleClick = (e) => {
+    dispatch(uiOpenModal())
+    console.log(e);
+  }
+````
+En `components/calendar/CalendarModal.js`
+* Se importan 2 nuevos CustomHook de __React Redux__ el useDispatch, useSelector y se importa la acción `uiCloseModal`.
+````
+import { useDispatch, useSelector } from 'react-redux';
+...
+import { uiCloseModal } from '../../actions/ui';
+````
+* Se implementa el dispatch, para activar las acciones.
+* Usamos useSelector para buscar el estado `state.ui` y obtener el estado de `modalOpen` para utilizarlo en la componente.
+````
+const dispatch = useDispatch();
+const { modalOpen } = useSelector(state => state.ui);
+````
+* Se implementa el dispatch en la función `closeModal` que se usa la acción `uiCloseModal` que cambiará el estado de `modalOpen` a `false`.
+````
+const closeModal = () => {
+    dispatch(uiCloseModal());
+  }
+````
+* Se agrega el estado que se obtuvo de Redux para pasarlo a `isOpen` en el caso que sea `flase` se cerrará y en el contrario se abrira el componente.
+````
+<Modal
+  isOpen={ modalOpen }
+  onRequestClose={closeModal}
+  style={customStyles}
+  closeTimeoutMS={300}
+  className="modal"
+  overlayClassName="modal-fondo"
+>
+````
+----
