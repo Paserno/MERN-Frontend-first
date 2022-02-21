@@ -7,6 +7,7 @@ Elementos utilizados:
 * __[Moment.js](https://www.npmjs.com/package/moment)__ - [Page](https://momentjs.com)
 * __[React Modal](https://www.npmjs.com/package/react-modal)__
 * __[React DateTime Picker](https://www.npmjs.com/package/react-datetime-picker)__
+* __[Sweet Alert 2](https://www.npmjs.com/package/sweetalert2)__
 
 ----
 
@@ -628,6 +629,64 @@ const handleSubmitForm = (e) => {
 <input
   type="text"
   className="form-control"
+  placeholder="Título del evento"
+  name="title"
+  autoComplete="off"
+  value={ title }
+  onChange={ handleInputChange }
+/>
+````
+----
+### 6,5.- Validación de Formulario Modal
+En este punto se agregaran unas valicaciones en el componente modal.
+
+Pasos a Seguir: 
+* Instalar __[Sweet Alert 2](https://www.npmjs.com/package/sweetalert2)__ para mostrar errores.
+* Agregar validaciónes en la función Sumbit del formulario.
+
+En `components/calendar/CalendarModal.js`
+* Una vez instalado Sweet Alert se importará.
+````
+import Swal from 'sweetalert2';
+````
+* Se agrega un estado para realizar la validación del titulo.
+* Adicionalmente desestructuramos 2 elementos mas, `start` y `end`.
+````
+const [titleValid, setTitleValid] = useState(true);
+
+const { notes, title, start, end } = formValues;
+````
+* Agregamos en la función Submit diferentes elementos.
+  * Creamos instancias de moment con los estados `start` y `end`.
+  * Realizamos la primera validación usando `isSameOrAfter` que este es propio de __moment__, que hace la comparación entre las dos constantes creadas, en el caso que sea menor o igual `momentEnd` entrará a la condición y saltando una alerta de __Sweet Alert__.
+  * Creamos una validación que si el `title` es menor a 2 caracteres, entrará a la condicón.
+  * Finalmente si pasa todo las condiciones se mandará un `true` en la validación del titulo y se llamará a la fucnión que cerrará el formulario modal.
+````
+const handleSubmitForm = (e) => {
+  e.preventDefault();
+
+  const momentStart = moment( start );
+  const momentEnd = moment( end );
+
+  if ( momentStart.isSameOrAfter( momentEnd )){
+    Swal.fire('Error', 'La fecha fin debe ser mayor a la fecha de inicio', 'error');
+    return;
+  }
+
+  if ( title.trim().length < 2 ) {
+    return setTitleValid(false); 
+  }
+
+  setTitleValid(true);
+  closeModal();
+
+}
+````
+* Agregamos una condición en `className` si el valor de useState del titulo es `false` se activará un elemento de bootstrap que mostrará el input del titulo en rojo advirtiendo al usuario que necesita mas caracteres el titulo.
+````
+<input
+  type="text"
+  className={`form-control ${ !titleValid && 'is-invalid'}`}
   placeholder="Título del evento"
   name="title"
   autoComplete="off"
