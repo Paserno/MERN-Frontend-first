@@ -9,6 +9,11 @@ Elementos utilizados:
 * __[React DateTime Picker](https://www.npmjs.com/package/react-datetime-picker)__
 * __[Sweet Alert 2](https://www.npmjs.com/package/sweetalert2)__
 
+Redux
+* __[Redux](https://es.redux.js.org)__
+* __[React Redux](https://react-redux.js.org)__
+* __[Redux Thunk](https://www.npmjs.com/package/redux-thunk)__
+
 ----
 
 Recordar que si se desea ejecutar esta aplicación, deben de reconstruir los módulos de node así:
@@ -693,5 +698,85 @@ const handleSubmitForm = (e) => {
   value={ title }
   onChange={ handleInputChange }
 />
+````
+----
+### 7.- Configuración Redux
+En este punto se hará la instalación de Redux, React Redux y Redux Thunk, para la configuración.
+
+Pasos a Seguir:
+* Crear los tipos que estará centralizada para el uso del reducer y acitons.
+* Crear el primer reducer llamado `uiReducer` en `reducers/uiReducer.js`.
+* Crear una raíz de Reducer donde se centralizará todos los reducer que se creen para pasarlo a la configuración.
+* Crear el store con la configuración necesaria para Redux.
+
+En `types/types.js`
+* Se crea los primeros tipos que se usarán.
+````
+export const types = {
+
+    uiOpenModal: '[UI] Open Modal',
+    uiCloseModal: '[UI] Close Modal',
+}
+````
+En `reducers/uiReducer.js`
+* Se importan los tipos.
+````
+import { types } from "../types/types";
+````
+* Se crea el estado inicial del reducer.
+````
+const initialState = {
+    modalOpen: false,
+}
+````
+* Se crea el reducer llamado `uiReducer` donde se le pasa por parametro el estado inicial y el `action`.
+* Se crea el __switch__ del reducer con su primer case que cambiará el estado inicial y el defalut que devolverá el estado.
+````
+export const uiReducer = ( state = initialState, action ) => {
+
+    switch ( action.type ) {
+        case types.uiOpenModal:
+            return {
+                ...state,
+                modalOpen: true
+            }
+            
+        default:
+            return state;
+    }
+}
+````
+En `reducers/rootReducer.js`
+* Se importa un elemento de __Redux__ llamado `combineReducers` y el reducer que se creo.
+````
+import { combineReducers } from 'redux';
+import { uiReducer } from './uiReducer';
+````
+* Se asigna el reducer al `combineReducers`, en este punto se agregarán todos los reducer que se creen en la aplicación. 
+````
+export const rootReducer = combineReducers({
+    ui: uiReducer,
+})
+````
+En `store/store.js`
+* En el store se hará la configuración, agregando importaciones de Redux, thunk que permitirá el uso de actions que interactuen con `dispatch` y `getState` y el combinador de reducer `rootReducer`.
+````
+import { createStore, compose, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+
+import { rootReducer } from '../reducers/rootReducer';
+````
+* Se agrega la configuración para utilizar la herramienta __Redux DevTools__.
+````
+const composeEnhancers = (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
+````
+* Se crea el store, pasandole el combinador de reducer, y usando el middleware thunk con ayuda de la configuración de Redux DevTools.
+````
+export const store = createStore(
+    rootReducer,
+    composeEnhancers(
+        applyMiddleware( thunk )
+    )
+)
 ````
 ----
