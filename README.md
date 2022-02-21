@@ -5,7 +5,7 @@ Elementos utilizados:
 * __[React Router v5](https://v5.reactrouter.com/web/guides/quick-start)__
 * __[React Big Calendar](https://www.npmjs.com/package/react-big-calendar)__
 * __[Moment.js](https://www.npmjs.com/package/moment)__ - [Page](https://momentjs.com)
-
+* __[React Modal](https://www.npmjs.com/package/react-modal)__
 
 ----
 
@@ -324,5 +324,121 @@ const onDobleClick = (e) => {
     event: CalendarEvent
   }}
 />
+````
+----
+### 4.- Pantalla Modal
+En este punto se instalará un __React Modal__, para el manejo de la edición del calenadrio.
+
+Pasos a Seguir: 
+* Instalación de __[React Modal](https://www.npmjs.com/package/react-modal)__.
+* Crear componente __CalendarModal__ para mostrar la pantalla modal que será para la edición.
+* Implementar __CalendarModal__ en el componente __CalendarScreen__.
+
+En `components/calendar/CalendarModal.js`
+* Se importa __useState__ de React y __Modal__ de la instalación de React Modal. 
+````
+import { useState } from 'react';
+import Modal from 'react-modal';
+````
+* Agregamos el estilo personalizado que esta en la documentación de __React Modal__. _(Para centralizar la pantalla modal)_
+* Se hace referencia al id del elemento html en este caso es `#root`.
+````
+const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+    },
+  };
+
+Modal.setAppElement('#root');
+````
+* Se crea el componente __CalendarModal__.
+* Agregamos un __useState__ para manejar el estado de la pantalla modal si se mantiene abierta o cerrada, esto proximamente sera remplazada por los estados en Redux.
+* Creamos la función que manejará el estado cuando se cierre la pantalla modal. 
+````
+export const CalendarModal = () => {
+
+    const [isOpen, setIsOpen] = useState(true)
+
+    const closeModal = () => {
+        setIsOpen(false);
+        console.log('closing...');
+    }
+    ...
+}
+````
+* Se invoca el componente __Modal__ que viene en la documentación.
+  * Le pasamos el __useState__ en isOpen.
+  * Agregamos la función `closeModal` en onRequestClose.
+  * Implementamos los estilos que viene del objeto `customStyles`.
+  * Le damos un timeout de 300ms.
+  * Agregamos unos estilos adicionales, luego mostramos un mensaje de prueba.
+````
+return (
+    <Modal
+        isOpen={ isOpen }
+        onRequestClose={ closeModal }
+        style={ customStyles }
+        closeTimeoutMS={ 300 }
+        className="modal"
+        overlayClassName="modal-fondo"
+      >
+          <h1> Hola mundo </h1>
+          <hr />
+          <span> hola diego</span>
+      </Modal>
+  )
+````
+En `components/calendar/CalendarScreen.js`
+* Agregamos al final del return el componente __CalendarModal__.
+````
+<CalendarModal />
+````
+En `styles.css`
+* Se agregan algunos estilos que vienen de la documentación ademas de personalizar algunos elementos como la transparencia que saldrá en el encima del contenido principal.
+````
+.ReactModalPortal > div{
+    opacity: 0;
+}
+
+.ReactModalPortal .ReactModal__Overlay {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    transition: opacity .3s ease-in-out;
+    z-index: 999;
+}
+
+.modal-fondo {
+    background-color: rgba(2, 0, 0, 0.596);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    position: fixed;
+}
+
+.ReactModalPortal .ReactModal__Overlay--after-open {
+    opacity: 1;
+}
+
+.ReactModalPortal .ReactModal__Overlay--before-close {
+    opacity: 0;
+}
+
+.modal {
+    background: white;
+    border-radius: 5px;
+    color: rgb(51, 51, 51);
+    display: inline;
+    max-height: 620px;
+    max-width: 500px;
+    outline: none;
+    padding: 10px;
+}
 ````
 ----

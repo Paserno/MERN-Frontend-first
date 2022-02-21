@@ -1,13 +1,14 @@
+import { useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import 'moment/locale/es';
 
 import { Navbar } from '../ui/Navbar';
 import { messages } from '../../helpers/calendar-messager-es';
+import { CalendarEvent } from './CalendarEvent';
+import { CalendarModal } from './CalendarModal';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { CalendarEvent } from './CalendarEvent';
-import { useState } from 'react';
+import 'moment/locale/es';
 
 moment.locale('es');
 
@@ -76,6 +77,8 @@ export const CalendarScreen = () => {
           event: CalendarEvent
         }}
       />
+
+      <CalendarModal />
 
     </div>
   )
