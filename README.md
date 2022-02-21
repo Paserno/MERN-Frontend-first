@@ -861,3 +861,143 @@ const closeModal = () => {
 >
 ````
 ----
+### 9.- Primer eventos de Calendario
+Se creará un nuevo reducer para el manejo de algunos eventos en el calendario.
+
+Pasos a Seguir:
+* Se agrega 2 tipos que se usará en la acciones y el reducer.
+* Se crea un nuevo Reducer llamado `calendarReducer`.
+* Se agrega el nuevo reducer en `rootReducer`.
+* Crear nueva acción que serán disparados.
+* Se crea un componente nuevo llamado __AddNewFab__ en `components/ui/AddNewFab.js` y se implmenta dispatch.
+* En el componente __CalendarScreen__ se hace uso de una de las nuevas acciones.
+
+En `types/types.js`
+* Se agregan dos nuevos tipos para agregar un nuevo evento y modificar un evento.
+````
+eventSetActive: '[Event] Set Active',
+eventAddNew: '[Event] Add New',
+````
+En `reducers/calendarReducer.js`
+* Se importan __moment__ y los tipos.
+````
+import moment from 'moment';
+import { types } from '../types/types';
+````
+* Se crea un objeto que manejará el estado inicial del reducer, pasandole un evento creado anteriormenete a `events` y creamos `activeEvent` en `null`.
+````
+const initialState = {
+    events: [{
+        title: 'Cumpleaños',
+        start: moment().toDate(), // new Date
+        end: moment().add( 2, 'hours').toDate(),
+        bgcolor: '#fafafa',
+        notes: 'Buscar a manuel',
+        user: {
+          _id: '123',
+          name: 'Diego'
+        }
+      }],
+    activeEvent: null
+};
+````
+* Creamos el nuevo Reducer llamado `calendarReducer`, pasando por propiiedad el estado inicial en `state` y `action`.
+* Creamos el __switch__ con la primera acción que recibira el payload en `activeEvent` y un default que retorna el `state`.
+````
+export const calendarReducer = ( state = initialState, action ) => {
+
+    switch ( action.type ) {
+
+      case types.eventSetActive:
+        return {
+          ...state,
+          activeEvent: action.payload
+        }
+        
+    
+        default:
+            return state;
+    }
+}
+````
+En `reducers/rootReducer.js`
+* Se agrega el nuevo reducer en `rootReducer`.
+````
+export const rootReducer = combineReducers({
+    ui: uiReducer,
+    calendar: calendarReducer
+})
+````
+En `actions/events.js`
+* Se crean 2 nuevos acciones que reciben por parametro `event` y enviarlo por el payload.
+````
+export const eventAddNew = (event) => ({
+    type: types.eventAddNew,
+    payload: event
+})
+
+export const eventSetActive = (event) => ({
+    type: types.eventSetActive,
+    payload: event
+})
+````
+En `components/ui/AddNewFab.js`
+* Se importa el CustomHook de __React Redux__ y la acción `uiOpenModal`.
+* Se crea el nuevo componente __AddNewFeb__.
+````
+import { useDispatch } from 'react-redux';
+import { uiOpenModal } from '../../actions/ui';
+
+export const AddNewFab = () => { ... }
+````
+* Se intancia el useDispatch.
+* Se crea una función para el botón, que cambia el estado del Redux, para mostrar la componente modal.
+````
+const dispatch = useDispatch()
+
+const hancleClickNew = () => {
+    dispatch(uiOpenModal());
+}
+````
+* Se crea un botón con el icono `fa-plus`, le asignamos al botón en el evento de click la función que abrirá el componente modal.
+````
+return (
+  <button
+     className="btn btn-primary fab"
+     onClick={ hancleClickNew }
+  >
+      <i className="fas fa-plus"></i>
+  </button>
+)
+````
+En `styles.css`
+* Se agregan algunos estilos para el nuevo componente específicamente en el botón.
+````
+.fab {
+    border-radius: 100%;
+    bottom: 20px;
+    font-size: 30px;
+    padding: 25px;
+    position: fixed;
+    right: 25px;
+}
+````
+En `components/calendar/CalendarScreen.js`
+* Se importa 2 nuevos elementos la acción creada y el componente __AddNewFab__.
+````
+...
+import { eventSetActive } from '../../actions/events';
+import { AddNewFab } from '../ui/AddNewFab';
+````
+* Se agrega el dispatch de la acción `eventSetActive` en la función select, esto hara que se le envie al Redux el estado que se tiene en el formulario _"se active"_.
+````
+const onSelectEvent = (e) => {
+  dispatch(eventSetActive(e));
+}
+````
+* Agregamos al final del componente __Calendar__ el nuevo componente creado llamado __AddNewFab__.
+````
+<AddNewFab />
+````
+----
+
