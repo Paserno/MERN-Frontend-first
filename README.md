@@ -559,3 +559,80 @@ const handleStartDateChange = (e) => {
 />
 ````
 ----
+### 6.- Obtener Información del Formulario Modal
+Almacenar el estado del formulario completo para luego enviarlo.
+
+Pasos a Seguir:
+* Crear un nuevo useState que almacene el estado de todo el componente modal.
+  * Crear la función que maneje los input de notas y titulo.
+  * Adaptar las dos funciónes que ya se tenía `handleStartDateChange` y `handleFinishDateChange` para entregar el estado al nuevo useState.
+
+En `components/calendar/CalendarModal.js`
+* Se implementa el nuevo useState, que le damos como valor inicial el `title`, `notes`, `start` y `end`.
+* Desestrucutrar `notes` y `title` del useState, para manejarlo en los input.
+````
+const [formValues, setFormValues] = useState({
+  title: 'Event',
+  notes: '',
+  start: now.toDate(), 
+  end: oneMoreHours.toDate()
+});
+
+const { notes, title } = formValues;
+````
+* Creamos la función que permitirá el camibo en los input's.
+````
+const handleInputChange = ({ target }) => {
+
+    setFormValues({
+      ...formValues,
+      [target.name]: target.value
+    });
+  }
+````
+* Agregamos en las dos funciones `handleStartDateChange` y `handleFinishDateChange` el `setFormValues` que permitirá entregar los cambios al useState.
+````
+const handleStartDateChange = (e) => {
+  setDateStart( e );
+  setFormValues({
+    ...formValues,
+    start: e
+  })
+} 
+
+const handleFinishDateChange = (e) => {
+  setDateEnd( e );
+  setFormValues({
+    ...formValues,
+    end: e
+  })
+} 
+````
+* Creamos la función Submit del formulario, que se tendra la información de todo el formulario.
+````
+const handleSubmitForm = (e) => {
+  e.preventDefault();
+
+  console.log( formValues );
+}
+````
+* Se agrega la función en el `<form>`
+````
+<form 
+  className="container"
+  onSubmit={ handleSubmitForm }
+>
+````
+* Agregamos el value y onChange en el input del `title` y `notes`.
+````
+<input
+  type="text"
+  className="form-control"
+  placeholder="Título del evento"
+  name="title"
+  autoComplete="off"
+  value={ title }
+  onChange={ handleInputChange }
+/>
+````
+----
