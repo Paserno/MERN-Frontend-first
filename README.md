@@ -1,6 +1,6 @@
 > __Elemento Anterior 👀:__ __[App de React con SASS - Redux - Firebase](https://github.com/Paserno/react-redux-fst-app)__
 # First MERN - Frontend
-Primera app MERN ( Mongo - Express - React - Node.js) utilizando las bases aprendidas para la implementación de todos estos elementos en conjuto, este repositorio será la parte del Fronend.
+Primera app MERN ( Mongo - Express - __React__ - Node.js) utilizando las bases aprendidas para la implementación de todos estos elementos en conjuto, este repositorio será la parte del Fronend.
 
 Elementos utilizados: 
 * __[React Router v5](https://v5.reactrouter.com/web/guides/quick-start)__
@@ -26,6 +26,9 @@ Y luego para hacerla correr.
 npm start
 ````
 <br>
+
+
+> __Elemento Posterior 👀:__ __[First MERN - Backend](https://github.com/Paserno/MERN-Backend-first)__
 
 ----
 ### 1.- Inicio del Proyecto
