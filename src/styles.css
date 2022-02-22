@@ -73,9 +73,16 @@ html, body {
 /* Floating Action Modal - FABS */
 .fab {
     border-radius: 100%;
-    bottom: 20px;
+    bottom: 25px;
     font-size: 30px;
     padding: 25px;
     position: fixed;
     right: 25px;
+}
+
+.fab-danger{
+    bottom: 25px;
+    padding: 10px;
+    position: fixed;
+    left: 25px;
 }

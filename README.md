@@ -1181,3 +1181,126 @@ if ( activeEvent ){
     }
 ````
 ----
+### 12.- Eliminar Evento
+Se creará la funcionalidad de borrar un evento y la creación del componente que manejará el botón.
+
+Pasos a Seguir:
+* Crear el tipo para la eliminación.
+* Se crea `case` del reducer llamado `calendarReducer` para manejar la eliminación.
+* Se crea la acción que será disparada por el componente que se creará.
+* Se crea un componente nuevo llamado __DeleteEventFab__ que sera implementado en el componente __CalendarScreen__ para realizar la eliminación.
+* Se realiza una limpieza del useState que maneja el formulario del componente __CalendarModal__.
+
+En `types/types.js`
+* Se mustra el nuevo tipo.
+````
+eventDeleted: '[Event] Event Deleted',
+````
+En `reducers/calendarioReducer.js`
+* Se crea el nuevo `case` que realizará un `.filter()` de la id que se le pase y mandando `activeEvent` en null.
+````
+case types.eventDeleted:
+  return {
+    ...state,
+    events: state.events.filter(
+      e => ( e.id !== state.activeEvent.id )
+    ),
+    activeEvent: null
+  }
+````
+En `actions/events.js`
+* Se crea la acción que será disparada.
+````
+export const eventDeleted = () => ({
+    type: types.eventDeleted
+});
+````
+En `components/ui/DeleteEventFab.js`
+* Se importa el __useDispatch__ de React Redux y la acción `eventDeleted`.
+````
+import { useDispatch } from 'react-redux'
+import { eventDeleted } from '../../actions/events';
+````
+* Se crea el componente __DeleteEventFab__.
+* Se implementa el useDispatch.
+* Se crea una función que disparará la acción `eventDeleted` para realizar la eliminación.
+* Se retorna en el componente un botón que tiene la función `handleDelete`.
+````
+export const DeleteEventFab = () => {
+     
+    const dispatch = useDispatch()
+
+    const handleDelete = () => {
+        dispatch( eventDeleted() );
+    }
+
+   return (
+     <button
+        className="btn btn-danger fab-danger"
+        onClick={ handleDelete }
+     >
+         <i className="fas fa-trash"></i>
+         <span> Borrar Evento</span>
+     </button>
+   )
+ }
+````
+En `styles.css`
+* Se le agrega unos estilos al botón del componente __DeleteEventFab__.
+````
+.fab-danger{
+    bottom: 25px;
+    padding: 10px;
+    position: fixed;
+    left: 25px;
+}
+````
+En `components/calendar/CalendarScreen.js`
+* Se imporetan dos elementos nuevos, la acción para realizar la limpieza `eventClearActiveEvent` y el componente __DeleteEventFab__.
+````
+...
+import { eventClearActiveEvent, eventSetActive } from '../../actions/events';
+import { DeleteEventFab } from '../ui/DeleteEventFab';
+````
+* Se toma del __useSelector__ el estado llamado `activeEvent`.
+````
+const { events, activeEvent } = useSelector( state => state.calendar );
+````
+* Se agrega una función para que el botón de eliminar desaparezca _(pasando `activeEvent` a null)_.
+````
+const onSelectSlot = (e) => {
+  dispatch( eventClearActiveEvent() )
+}
+````
+* Se agrega 2 propiedades adicionales en el componente __Calendar__ esto es `onSelectSlot` pasandole la función recién creada, ademas de `selectable` en true.
+````
+<Calendar
+  ...
+  onSelectSlot={ onSelectSlot }
+  selectable={ true }
+  ...
+/>
+````
+* En el caso que sea null `activeEvent` desaparecerá el botón de eliminar.
+````
+{ 
+  (activeEvent) && <DeleteEventFab />
+}
+````
+En `components/calendar/CalendarModal.js`
+* Se agrega un `else` en el __useEffect__ para que no consérve el formulario cuando el elemento seleccionado sea eliminado. 
+````
+useEffect(() => {
+  if( activeEvent ){
+    setFormValues( activeEvent );
+  } else {
+    setFormValues( initEvent );
+  }
+  
+}, [activeEvent, setFormValues])
+````
+* Se hace una condición con `activeEvent` para mostrar el titulo de formulario.
+````
+<h1> { (activeEvent)? 'Editar evento' : 'Nuevo evento' } </h1>
+````
+----
