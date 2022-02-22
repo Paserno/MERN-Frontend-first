@@ -1033,3 +1033,85 @@ dispatch(eventAddNew({
 }))
 ````
 ----
+### 10.- Mostrar eventos en el Calendario
+En este punto se deseá mostrar los eventos que se agreguen por pantalla en el calendario.
+
+Pasos a Seguir: 
+* Se crará un nuevo tipo para la limpieza del formulario activo.
+* Se agrega un nuevo `case` en el reducer llamado `calendarReducer` que maneje la nueva opción de limpieza.
+* Se crea la acción que será activada en el componente.
+* En el componente __CalendarScreen__ se utiliza un CustomHook de React Redux para buscar el estado de `events` y pasarlo al __Calendar__ para que lo dibuje en el componente.
+* En el componente __CalendarModal__ se implementa el __useEffect__ para obtener el estado activo. _(que fue seleccionado por el cliente)_
+
+En `types/types.js`
+* Se agrega un nuevo tipo.
+````
+eventClearActiveEvent: '[Event] Clear Active Event',
+````
+En `reducers/CalendarReducer.js`
+* En este `case` se conserba el estado y ademas el estado de `activeEvent` se cambia a null.
+````
+case types.eventClearActiveEvent:
+  return {
+    ...state,
+    activeEvent: null
+  }
+````
+En `actions/events.js`
+* Se crea la acción que será activada por el componente __CalendarModal__.
+````
+export const eventClearActiveEvent = () => ({
+    type: types.eventClearActiveEvent
+});
+````
+En `components/calendar/CalendarScreen.js`
+* Se importa __useSelector__ de React Redux que permitirá realizar la busqueda del estado que necesita del Redux.
+````
+...
+import { useDispatch, useSelector } from 'react-redux';
+````
+* Se toma el estado `events` que se encuentra en `state.calendar`.
+  * Se elimino el `events` anterior que era un objeto con la información inicial que se le pasaba al componente __Calendar__, ahora se le pasa el estado que proviene de Redux.
+````
+const { events } = useSelector( state => state.calendar );
+````
+En `components/calendar/CalendarModal.js`
+* Se importan 2 elementos nuevos en el coponente, este seria useEffect de React y una nueva acción `eventClearActiveEvent`.
+````
+...
+import { useEffect, useState } from 'react';
+import { eventAddNew, eventClearActiveEvent } from '../../actions/events';
+````
+* Creamos un valor inicial que se lo asignaremos al __useState__ que maneja el formulario del componente modal.
+````
+const initEvent = {
+  title: '',
+  notes: '',
+  start: now.toDate(), 
+  end: oneMoreHours.toDate()
+}
+````
+* Le asignamos el valor inicial al useState del formulario.
+````
+const [formValues, setFormValues] = useState( initEvent );
+````
+* Se implementa el useEffect, para controlar cuando el estado `activeEvent` cambia, para luego pasarlo al formulario.
+* Realizamos una condición de protección, en el caso que se pasen datos se pondra en el formulario.
+````
+useEffect(() => {
+  
+  if( activeEvent ){
+    setFormValues( activeEvent );
+  }
+
+}, [activeEvent, setFormValues])
+````
+* En la función `closeModal` le agregamos un nuevo dispatch con el evento `eventClearActiveEvent` que hará que el estado `activeEvent` pase a null. _(Se hace en el caso que se vuelva a seleccionar el mismo evento de esta manera siempre pasarle los datos)_
+````
+const closeModal = () => {
+  dispatch(uiCloseModal());
+  dispatch( eventClearActiveEvent() );
+  setFormValues( initEvent );
+}
+````
+----
