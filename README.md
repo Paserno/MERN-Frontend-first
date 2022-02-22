@@ -1115,3 +1115,69 @@ const closeModal = () => {
 }
 ````
 ----
+### 11.- Editar el evento activo
+Se creará un acción para editar los eventos del calendario.
+
+Pasos a Seguir: 
+* Se agrará un tipo mas para la actualización.
+* Se agrega un case al Reducer llamado `claendarReducer` con el nuevo tipo.
+* Se implementa la acción para realizar la edición.
+* En el componente __CalendarModal__ se implementa una condicón para detectar si el evento se va a editar o crear.
+
+En `types/types.js`
+* Se crea el tipo para la edición. 
+````
+eventUpdated: '[Event] Event Updated',
+````
+En `reducers/calendarReducer.js`
+* Se agrega la id al `events` que se entrega al estado inicial del reducer.
+````
+events: [{
+        id: new Date().getTime(),
+        ...
+        }]
+````
+* Se crea el `case` del Reducer `calendarReducer`, se crea un `.map()` que realiza una condicón, en el caso que sea el mismo id que se mande por el payload, se realizará la actualizacón al contenido, en el caso que no, no pasará nada. 
+````
+case types.eventUpdated:
+  return {
+    ...state,
+    events: state.events.map(
+      e => ( e.id === action.payload.id ) 
+        ? action.payload
+        : e
+    )
+  }
+````
+En `actions/events.js`
+* Se crea el evento sicrono, que recibe por parametro el `event` y este sera enviado por el payload.
+````
+export const eventUpdated = ( event ) => ({
+    type: types.eventUpdated,
+    payload: event
+});
+````
+En `components/calendar/CalendarModal`
+* Una importación nueva de la acción creada recientemente `eventUpdated`.
+````
+import { eventAddNew, eventClearActiveEvent, eventUpdated } from '../../actions/events';
+````
+* En la función `handleSubmitForm` se agrega algunas validaciones.
+  * En el caso que se tenga `activeEvent` se disparará la acción `eventUpdated` enviando por argmento el `formValues`.
+  * En el caso de tener null en  `activeEvent` se hará el disparo de la acción `eventAddNew` que creará un nuevo evento.
+````
+if ( activeEvent ){
+      dispatch( eventUpdated( formValues ) );
+      
+    } else {
+      dispatch( eventAddNew({
+        ...formValues,
+        id: new Date().getTime(),
+        user: {
+          _id: '123',
+          name: 'Diego'
+        }
+      }) );
+    }
+````
+----
