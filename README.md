@@ -1,3 +1,4 @@
+> __Elemento Anterior 👀:__ __[App de React con SASS - Redux - Firebase](https://github.com/Paserno/react-redux-fst-app)__
 # First MERN - Frontend
 Primera app MERN ( Mongo - Express - React - Node.js) utilizando las bases aprendidas para la implementación de todos estos elementos en conjuto, este repositorio será la parte del Fronend.
 
