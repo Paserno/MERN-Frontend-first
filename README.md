@@ -1364,3 +1364,113 @@ export const rootReducer = combineReducers({
 })
 ````
 ----
+### 2.- Acción de Login
+En este punto se implementará el uso del formulario de Login y se creará la acción que será disparada.
+
+Paso a Seguir:
+* Crear CustomHook __useForm__.
+* Creación del archivo donde estarán las acciones de __Auth__.
+* Implementar CustomHook y habilitar formulario de login en el componente __LoginScreen__.
+
+En `hook/useForm.js`
+* Se importa __useState__ para el uso del CustomHook.
+````
+import { useState } from 'react';
+````
+* Se crea el hook __useForm__ que recibirá por parametro un `initialState`.
+* Utilizando el useState, le pasamos el estado inicial que se recibirá por parametros.
+````
+export const useForm = ( initialState = {} ) => {
+    
+    const [values, setValues] = useState(initialState);
+    ...
+}
+````
+* Se crea una función de reset, que cambiará el estado a su estado inicial.
+````
+const reset = () => {
+    setValues( initialState );
+}
+````
+* Se crea la función `handleInputChange` que recibe por parametros el `target` esto hará que cambie el estado, dandole nuevos valores al inuput, en pocas palabras permitiendo que se pueda editar el contenido del input.
+````
+const handleInputChange = ({ target }) => {
+    setValues({
+        ...values,
+        [ target.name ]: target.value
+    });
+
+}
+````
+* Se retorna un arreglo con las dos funciones, y el estado del useState.
+````
+return [ values, handleInputChange, reset ];
+````
+En `actions/auth.js`
+* Creamos la primera acción asíncrona `startLogin` que recibira el `email` y `password`.
+* En el callback mandamos una impresión por pantalla para evaluar lo que enviemos.
+````
+export const startLogin = ( email, password ) => {
+    return async() => {
+        console.log(email, password);
+    }
+}
+````
+* Importamos 3 nuevos elementos, useDisaptch para disparar las acciones, __useForm__ para utilizarlo en los formularios y `startLogin` que es la acción.
+````
+import { useDispatch } from 'react-redux';
+import { useForm } from '../../hook/useForm';
+import { startLogin } from '../../actions/auth';
+````
+* Guardamos el __useDispatch__ en la constante.
+* Implementamos el CustomHook __useForm__, luego desestructuramos los elementos del `formLoginValues`, para utilizarlo en el formulario.
+````
+const dispatch = useDispatch();
+
+const [ formLoginValues, handleLoginInputChange ] = useForm({
+  lEmail: 'correo@gmail.com',
+  lPassword: '123456'
+});
+
+const { lEmail, lPassword } = formLoginValues;
+````
+* Se crea la función del formulario del login `handleLogin`, disparamos la acción que mostramos anteriormente, mandandole los elementos del formulario.
+````
+const handleLogin = (e) => {
+  e.preventDefault();
+
+  dispatch(startLogin(lEmail, lPassword));
+}
+````
+* En el formulario de login agregamos la función recién mostrada `handleLogin`.
+* Agregamos en los 2 input de `email` y `password` el `name`, `value` correspondiente y la función del CustomHook `handleLoginInputChange`.
+`````
+ <form onSubmit={ handleLogin }>
+            <div className="form-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Correo"
+                name='lEmail'
+                value={ lEmail }
+                onChange={ handleLoginInputChange }
+              />
+            </div>
+            <div className="form-group">
+              <input
+                type="password"
+                className="form-control"
+                placeholder="Contraseña"
+                name='lPassword'
+                value={ lPassword }
+                onChange={ handleLoginInputChange }
+              />
+            </div>
+            <div className="form-group">
+              <input
+                ...
+              />
+            </div>
+          </form>
+````
+----
