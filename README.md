@@ -1444,7 +1444,7 @@ const handleLogin = (e) => {
 ````
 * En el formulario de login agregamos la función recién mostrada `handleLogin`.
 * Agregamos en los 2 input de `email` y `password` el `name`, `value` correspondiente y la función del CustomHook `handleLoginInputChange`.
-`````
+````
  <form onSubmit={ handleLogin }>
             <div className="form-group">
               <input
@@ -1472,5 +1472,94 @@ const handleLogin = (e) => {
               />
             </div>
           </form>
+````
+----
+### 3.- Petición HTTP de Autenticación
+En este punto se hará una función fetch para realizar el login sin token.
+
+Paso a Seguir: 
+* Crear helper que manejará el fetch.
+* Se implementa el nuevo case del reducer de auth.
+* Se modifica la acción `startLogin` y crear una nueva acción sincrona.
+
+En `helpers/fetch.js`
+* Se almacena en una constante la variable global.
+````
+const baseURL = process.env.REACT_APP_API_URL;
+````
+* Creamos la función `fetchSinToken` que recibirá por parametro el `endpoint`, `data` y `method` que por defecto es un `GET`.
+* Almacenamos en la constante `url` se almacenará el contenido que se envíe por el parametro.
+* En el caso que se envíe un metodo `GET` se retornará el fetch con el `url`.
+* En el caso que se mande un metodo diferente, se retornará el `method`, en el `headers` se manda el `content` que sera tipo __JSON__, finalmente se manda el contenido del body. 
+````
+const fetchSinToken = ( endpoint, data, method = 'GET' ) => {
+
+    const url = `${ baseURL }/${ endpoint }`; 
+
+    if ( method === 'GET' ){
+         return fetch( url );
+    } else {
+        return fetch( url, {
+            method,
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify( data )
+        });
+    }
+}
+````
+* Se exporta la función `fetchSinToken`.
+````
+export {
+    fetchSinToken
+}
+````
+En `reducers/authReducer.js`
+* Se agrega el nuevo `case`, retornamos el `state` y cambiamos el `checking` en false y el contenido de payload.
+````
+case types.authLogin:
+return{
+    ...state,
+    checking: false,
+    ...action.payload
+}
+````
+En `actions/auth.js`
+* Se importa la función del helper y los tipos.
+````
+import { fetchSinToken } from "../helpers/fetch"
+import { types } from "../types/types";
+````
+* En el callback recibimos por parametro `dispatch` gracias a thunk.
+* En la función que creamos mandamos el endpoint, la data que esta `email` con `password` y el metodo POST.
+* Luego tomamos lo que venga en el fecth para almacenarlo en la constante `body`.
+* Realizamos una validación con el `body.ok`, en el caso q sea true se guardará el token en __localStorage__ con la fecha de creación.
+* Se dispará la acción de login.
+````
+export const startLogin = ( email, password ) => {
+    return async( dispatch ) => {
+
+        const resp = await fetchSinToken( 'auth', { email, password }, 'POST' );
+        const body = await resp.json();
+
+        if ( body.ok ){
+            localStorage.setItem('token', body.token );
+            localStorage.setItem('token-init-date', new Date().getTime() );
+            
+            dispatch( login({
+                uid: body.uid,
+                name: body.name
+            }) );
+        }
+    }
+}
+````
+* Se crea la acción sincrona de login, recibiendo el user, para luego mandarlo por el payload.
+````
+const login = ( user ) => ({
+    type: types.authLogin,
+    payload: user
+})
 ````
 ----
