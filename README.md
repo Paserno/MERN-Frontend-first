@@ -1563,3 +1563,94 @@ const login = ( user ) => ({
 })
 ````
 ----
+### 4.- Implementación de Register
+Se implementa la acción para realizar el registro en la aplciación Backend.
+
+Pasos a Seguir: 
+* Se crera la acción asíncrona `startRegister` para realizar el registro en el Backend.
+* Se adapta el formulario de register para tomar los datos y disparar la acción `startRegister`.
+
+En `actions/auth.js`
+* Se importa __SweetAlert__ para implementarla en los errores que envía el backend.
+````
+import Swal from 'sweetalert2';
+````
+* Se crea la acción asíncrona `startRegister` que recibirá por parametro `email`, `password` y `name`.
+* Implementamos el callback que recibe por parametros gracias a __Thunk__ el dispatch.
+* Guardamos en la constante `resp` lo que venga en la función `fetchSinToken`, que le pasamos por argumento el endpoint, la data que seria `email`, `password` y `name` y finalmente le pasamos el metodo `POST`, ya que será un registro de usuario.
+* Almacenamos en una variable llamada `body` el contenido que venga en `resp.json()`.
+* Relizamos una condción, si `body.ok` es true, se guardará el token que venga del backend en el __localStorage__ al igual que la fecha que se creo.
+* Finalmente disparamos la acción `login()` pasandole por argumento el `uid` y `name`.
+* En el caso que venga un `body.ok` en false, saltara un error con el mensaje emitido desde el backend.
+````
+export const startRegister = ( email, password, name ) => {
+    return async( dispatch ) => {
+
+        const resp = await fetchSinToken( 'auth/new', { email, password, name }, 'POST' );
+        const body = await resp.json();
+
+        if ( body.ok ){
+            localStorage.setItem('token', body.token );
+            localStorage.setItem('token-init-date', new Date().getTime() );
+            
+            dispatch( login({
+                uid: body.uid,
+                name: body.name
+            }) );
+        } else {
+            Swal.fire('Error', body.msg, 'error')
+        }
+    }
+}
+````
+En `components/auth/LoginScreen.js`
+* Importamos 2 nuevos elementos, la acción `startRegister` y SweetAlert.
+````
+...
+import { startLogin, startRegister } from '../../actions/auth';
+import Swal from 'sweetalert2';
+````
+* Utilizamos nuevamente el CustomHook __useForm__, pasandole elementos que se utilizarán.
+* Luego lo desestructuramos del estado `formRegisterValues`, para utilizarlos en el formulario.
+````
+const [ formRegisterValues, handleRegisterInputChange ] = useForm({
+  rName: 'Diego',
+  rEmail: 'diego@gmail.com',
+  rPassword: '123456',
+  rPassword2: '123456'
+});
+
+const { rName, rEmail, rPassword, rPassword2 } = formRegisterValues;
+````
+* Creamos la función del formulario register `handleRegister`.
+* Creamos una validación, que el password y el password de confirmar sean iguales, en el caso que no saltará un alerta.
+* Finalmente si todo sale bien, se dispará la acción `startRegister` pasandole por argumento el `email`, `password` y `name` del formulario register.
+````
+const handleRegister = (e) => {
+  e.preventDefault();
+
+  if ( rPassword !== rPassword2 ){
+    return Swal.fire('Error', 'Las contraseñas deben de ser iguales', 'error');
+  }
+  
+  dispatch(startRegister(rEmail, rPassword, rName));
+}
+````
+* Le agregamos al formulario la función `handleRegister`.
+* En los 4 input agregamos el `name`, `value` y `onChange` correspondiente. _(Todos los input con onChange del formulario register usan `handleRegisterInputChange`)_
+````
+<form onSubmit={ handleRegister }>
+  <div className="form-group">
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Nombre"
+      name="rName"
+      value={ rName }
+      onChange={ handleRegisterInputChange }
+    />
+    ...
+  </div>
+</form>
+````
+----
