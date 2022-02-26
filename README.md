@@ -1308,3 +1308,59 @@ useEffect(() => {
 <h1> { (activeEvent)? 'Editar evento' : 'Nuevo evento' } </h1>
 ````
 ----
+# MERN Frontend - Auth con Backend
+El segundo nivel de Frontend es para preparar la autenticación del frontend hacia el backend.
+
+<img src="https://www.itsitio.com/wp-content/uploads/2019/10/1_NVwfSg8wHwFZ_R7ULgzdLQ-780x405.jpeg" alt="CRUD" width="320"/>
+
+----
+### 1.- Reducer de Auth
+Se creará el reducer de auteticación.
+
+Paso a Seguir:
+* Se creará los archivos que manejen las variables de entorno.
+* Se agregan tipos para manejar el nuevo reducer.
+* Se crea el nuevo reducer en `reducers/authReducer.js`.
+* El nuevo reducer se agrega en `reducers/rootReducer.js`
+
+En `types/types.js`
+* Se crea todo los tipos que se utilizaran para el manejo de los estados.
+````
+authCheckingFinish: '[Auth] Finish Checking Login State',
+authStartLogin: '[Auth] Start Login',
+authLogin: '[Auth] Login',
+authStartRegister: '[Auth] Start Register',
+authStartStartTokenRenew: '[Auth] Start Token Renew',
+authLogout: '[Auth] Logout',
+````
+En `reducers/authReducer.js`
+* Se crea el estado inicial, proximamente se utilizará el `uid` y `name`.
+````
+const initialState = {
+    checking: true,
+    // uid: null,
+    // name: null
+}
+````
+* Se crea el reducer `authReducer`, pasandole el estado inicial al `state` que se tiene en las propiedades y el `action`.
+````
+export const authReducer = ( state = initialState, action ) => {
+
+    switch ( action.type ) {
+        
+    
+        default:
+            return state;
+    }
+}
+````
+En `reducers/rootReducer.js`
+* Se agrega el nuevo reducer.
+````
+export const rootReducer = combineReducers({
+    ui: uiReducer,
+    calendar: calendarReducer,
+    auth: authReducer
+})
+````
+----
