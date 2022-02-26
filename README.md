@@ -1654,3 +1654,103 @@ const handleRegister = (e) => {
 </form>
 ````
 ----
+### 5.- Mantener Estado del Auth
+En este punto se creará una nueva función que interactuará con el backend para renovar el token, esto servirá al momento de recargar la pagina.
+
+Pasos a Seguir:
+* Crear función en los helpers `fetchConToken`.
+* Crear un nuevo case en el reducer `authReducer`.
+* Crear 2 acciones una asíncrona y otra sincrona.
+* Activamos la acción asíncrona en la ruta __AppRouter__ para tener un mayor nivel de acceso en la aplicación.
+
+En `helpers/fetch.js`
+* Creamos la función `fetchConToken` muy similar a la anterior, recibiendo por parametros `endpoint`, `data` y `method`.
+* En la constante `url` se almacenará el path, y en la constante token, se tomará el contenido del __localStorage__ con `.getItem()`.
+* Realizamos una condición en el caso que el `method` sea GET, se enviará el method GET y el token que se tiene en el __localStorage__.
+* En el caso ser otro `method`, se enviará este, en el header se envia el Content y el token, ademas del contenido en de `data`.
+````
+const fetchConToken = ( endpoint, data, method = 'GET' ) => {
+
+    const url = `${ baseURL }/${ endpoint }`;
+    const token = localStorage.getItem('token') || '';
+
+    if ( method === 'GET' ){
+         return fetch( url, {
+             method,
+             headers: {
+                 'x-token': token
+             }
+         });
+    } else {
+        return fetch( url, {
+            method,
+            headers: {
+                'Content-type': 'application/json',
+                'x-token': token
+            },
+            body: JSON.stringify( data )
+        });
+    }
+}
+````
+En `reducers/authReducer.js`
+* Se crea el nuevo case, enviado un `checking` en false.
+````
+case types.authCheckingFinish:
+  return {
+      ...state,
+      checking: false
+  }
+````
+En `actions/auth.js`
+* Se crea la acción `startChecking`, que retorna un callback asíncrono que recibá el dispatch.
+* Enviado en la función helper `fetchConToken` el endpoint `auth/renew`, recibiendo la respuesta en la constante `body`.
+* En el caso que haya un `body.ok` en true, entrará a la condición el cual es guardar el token en el __localStorage__ con la fecha y disparar la acción `login` con el `uid` y `name``.
+* En el caso que sea `body.ok` en false, se enviará una impresión por pantalla con el error del backend y disparando la acción `checkingFinish()`.
+````
+export const startChecking = () => {
+    return async( dispatch ) => {
+        const resp = await fetchConToken( 'auth/renew' );
+        const body = await resp.json();
+
+        if ( body.ok ){
+            localStorage.setItem('token', body.token );
+            localStorage.setItem('token-init-date', new Date().getTime() );
+            
+            dispatch( login({
+                uid: body.uid,
+                name: body.name
+            }) );
+        } else {
+            console.log(body.msg)
+            dispatch( checkingFinish() );
+        }
+    }
+}
+````
+* Creamos la acción sincrona `checkingFinish` que será disparada por la acción anteriormentes creada.
+````
+const checkingFinish = () => ({
+    type: types.authCheckingFinish
+});
+````
+En `router/AppRouter.js`
+* Se importan dos elementos nuevos el __useEffect__ hook de React y __useDispatch__ custom hook de React Redux.
+````
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+...
+````
+* Se implementa el __useDispatch__.
+* Se agrega el useEffect que será renderizado cada vez que se inicie la aplicación o cuando dispatch camibe ya que es su dependencia.
+* Este disparará la acción asíncrona `startChecking`.
+````
+const dispatch = useDispatch();
+  
+  useEffect(() => {
+    
+    dispatch( startChecking() );
+      
+  }, [dispatch])
+````
+----
