@@ -1940,3 +1940,81 @@ import { eventClearActiveEvent, eventStartAddNew, eventUpdated } from '../../act
 dispatch( eventStartAddNew(formValues) );
 ````
 ----
+### 2.- Mostrar Evento desde el Backend
+En este punto se mostrará recibiremos el contenido que es enviado desde el backend para proximamente mostrarlo.
+
+Pasos a Seguir: 
+* Se crea un tipo nuevo.
+* Se modifica el reducer, para luego implementar un nuevo case.
+* Se crean 2 nuevas acciónes en `actions/events` la primera asíncrona y otra sincrona que se manejará local.
+* Finalmente se creará un useEffect en el componente __CalendarScreem__ para cuando se cargue el componente se muestre proximamente todos los eventos por pantalla.
+
+En `types/types.js`
+* Se crea el nuevo tipo de carga de eventos.
+````
+...
+eventLoaded: '[Event] Event Loaded',
+````
+* El valor inicial del state, específicamente `events` se eliminará todo el contenido que tenía.
+````
+const initialState = {
+    events: [],
+    activeEvent: null
+};
+````
+* Se crea el nuevo case donde se retornará el state, ademas de un arreglo de lo que se envíe por el `aciton.payload`.
+````
+case types.eventLoaded:
+    return {
+      ...state,
+      events: [ ...action.payload ]
+    }
+````
+En `actions/events.js`
+* Se crea la acción `eventStartLoading` asíncrona, retornamos un callback que tiene por propiedad el `dispatch` y encerramos el contenido de este con un `TryCatch`.
+* Se usa la función `fetchConToken` enviandole el endpoint `events` por defecto es un GET la petición fetch.
+* Recibimos el contenido del backend en la constante body.
+* Del body.eventos se lo pasamos a una constante pera luego enviarselo al dispatch, por mientras que no se soluciona lo de la fecha se imprimirá por consola solamente.
+* En el caso de un error se manda una impresión por consola.
+````
+export const eventStartLoading = () => {
+    return async( dispatch ) => {
+        try {
+            
+            const resp = await fetchConToken( 'events' );
+            const body = await resp.json();
+            
+            const events = body.eventos;
+
+            console.log(events);
+            // dispatch( eventLoaded(events) );
+
+        } catch (error) {
+            console.log(error);
+        }
+        
+    }
+}
+````
+* Se crea la acción sincrona `eventLoaded` que recibe por parametros `events`, para luego enviarlo por el payload.
+````
+const eventLoaded = (events) => ({
+    type: types.eventLoaded,
+    payload: events
+})
+````
+En `components/calendar/CalendarScreen.js`
+* Importamos __useEffect__ en el componente y la acción `eventStartLoading`.
+````
+import { useEffect, useState } from 'react';
+...
+import { eventClearActiveEvent, eventSetActive, eventStartLoading } from '../../actions/events';
+````
+* Se implementa el __useEffect__ disparando la acción `eventStartLoading`.
+````
+useEffect(() => {
+  dispatch(eventStartLoading())
+  
+}, [dispatch])
+````
+----

@@ -60,7 +60,6 @@ export const startChecking = () => {
                 name: body.name
             }) );
         } else {
-            console.log(body.msg)
             dispatch( checkingFinish() );
         }
 
