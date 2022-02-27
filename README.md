@@ -1754,3 +1754,50 @@ const dispatch = useDispatch();
   }, [dispatch])
 ````
 ----
+### 6.- Protección de Rutas
+En este punto se agregará rutas privadas y publicas para realizar la protección de los componentes.
+
+Pasos a Seguir:
+* Se copia e implementa la ruta Publica __[PublicRoute](https://github.com/Paserno/react-redux-fst-app/blob/main/src/routers/PublicRoute.js)__.
+* Se copia e implementa la ruta Privada __[PrivateRoute](https://github.com/Paserno/react-redux-fst-app/blob/main/src/routers/PrivateRoute.js)__.
+* En la ruta __AppRouter__ se implementa ambas rutas para realizar la protección de los componentes.
+
+En `router/PrivateRouter.js`
+* Se corrige el path de la ruta privada.
+````
+(isAuthenticated)
+  ? (<Component {...props} />)
+  : (<Redirect to="/login" />)
+````
+En `router/AppRouter.js`
+* Se importan 3 elementos nuevos useSelector, la ruta publica y privada.
+````
+import { useDispatch, useSelector } from 'react-redux';
+...
+import { PrivateRoute } from './PrivateRouter';
+import { PublicRoute } from './PublicRouter';
+````
+* Sacamos del estado global de la aplicación con ayuda de __useSelector__ el `checking` y `uid`.
+````
+const { checking, uid } = useSelector(state => state.auth)
+````
+* Realizamos una condición, cada vez que `checking` este en true, saldra `Cargando...`, esto proximamente se puede remplazar con un componente de carga mas estilizado.
+````
+if ( checking ){
+    return (<h5>Cargando...</h5>);
+  }
+````
+* En el `<Switch>` se implementa las dos rutas, agregando el `isAuthenticated` con `!!uid`, con la doble negación hacemos q si viene algo se transforme en _false_ y luego con la segunda negación pase a _true_.
+````
+<PublicRoute 
+  exact path="/login"
+  component={ LoginScreen }
+  isAuthenticated={ !!uid }
+/>
+<PrivateRoute 
+  exact path="/" 
+  component={ CalendarScreen } 
+  isAuthenticated={ !!uid }
+/>
+````
+----
