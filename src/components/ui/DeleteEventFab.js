@@ -1,5 +1,7 @@
+import Swal from 'sweetalert2';
+
 import { useDispatch } from 'react-redux'
-import { eventDeleted } from '../../actions/events';
+import { eventStartDeleted } from '../../actions/events';
 
 
 export const DeleteEventFab = () => {
@@ -7,7 +9,29 @@ export const DeleteEventFab = () => {
     const dispatch = useDispatch()
 
     const handleDelete = () => {
-        dispatch( eventDeleted() );
+
+      Swal.fire({
+        title: 'Borrar Evento',
+        iconColor:'red',
+        text: "Seguro que quieres Borrar este Evento!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Si, Borrar!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+
+          dispatch( eventStartDeleted() );
+           
+
+          Swal.fire(
+              'Borrado!',
+              'Tu Evento ha sido Borrado.',
+              'success'
+          )
+        }
+      })
     }
 
    return (

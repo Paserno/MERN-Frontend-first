@@ -2113,3 +2113,86 @@ import { eventClearActiveEvent, eventStartAddNew, eventStartUpdated } from '../.
 dispatch( eventStartUpdated( formValues ) );
 ````
 ----
+### 5.- Eliminar Evento
+En este punto se crea una acción asíncrona que eliminará los eventos, ademas se realiza un tipo que limpie los estados al hacer logout.
+
+Pasos a Seguir: 
+* Se crea un tipo nuevo para realizar la limpieza de los estados.
+* Se crea un nuevo case en el reducer de calendario.
+* Se crean 2 nuevos acciónes, uno asíncrono y sincrono, ademas de modificar otra acción.
+* Se implementa la acción de limpieza sincrona en la acción asíncrona de logout.
+* Se implementa la acción asíncrona en el botón de borrar evento, esto esta en el compoonente __DeleteEventFab__.
+
+En `types/types.js`
+* Se crea el tipo para realizar la limpieza de los eventos.
+````
+eventLogout: '[Event] Event Logout',
+````
+En `reducers/calendarReducer.js`
+* Se crea el case que cambiará el estado al `initialState` cuando se haga el logout.
+````
+case types.eventLogout:
+  return {
+    ...initialState
+  }
+````
+En `actions/events.js`
+* Se crea la acción asíncrona `eventStartDeleted` que retorna un callback que tiene como parámetro el `dispatch` y `getState` gracias a Thunk Redux.
+* Obtenemos un estado global la cual es `calendar.activeEvent` específicamente el id.
+* Luego implementamos la función `fetchConToken` enviado por argumento el path con el id recibido del estado global, un objeto vacío y el metodo DETELE, para luego recibir el contenido de la respuesta en la constante `body`.
+* En el caso que `body.ok` sea true, se disparará la acción sincrona `eventDeleted`.
+* En el caso de tener un false, se mandará una alerta con el error recibido por el backend.
+````
+export const eventStartDeleted = () => {
+    return async( dispatch, getState ) => {
+
+        const { id } = getState().calendar.activeEvent
+        try {
+            const resp = await fetchConToken(`events/${ id }` , {} ,'DELETE');
+            const body = await resp.json();
+
+            if( body.ok ){
+                dispatch(eventDeleted());
+            } else {
+                Swal.fire('Error', body.msg, 'error')
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+````
+* Se elimina el `export` de la función, ya que se usará localmente.
+````
+const eventDeleted = () => ({
+    type: types.eventDeleted
+});
+````
+* Se crea la acción que si se dispara limpiará el estado de los eventos.
+````
+export const eventLogout = () => ({
+    type: types.eventLogout
+});
+````
+En `actions/auth.js`
+* En la acción asíncrona se dispara la acción `eventLogout` que limpiara los eventos cuando se haga el logout. _(No olviar importar la acción)_
+````
+export const startLogout = () => {
+    return ( dispatch ) => {
+
+        localStorage.clear();
+        dispatch( eventLogout() );
+        dispatch( logout() );
+    }
+}
+````
+En `components/ui/DeleteEventFab.js`
+* Se remplaza la importación de la acción sincrona `eventDeleted` por la nueva acción asíncrona `eventStartDeleted`.
+````
+import { eventStartDeleted } from '../../actions/events';
+````
+* En la función `handleDelete` se dispará la nueva acción `eventStartDeleted` asíncrona.
+````
+dispatch( eventStartDeleted() );
+````
+----
