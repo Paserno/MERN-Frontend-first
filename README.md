@@ -2018,3 +2018,58 @@ useEffect(() => {
 }, [dispatch])
 ````
 ----
+### 3.- Transformar las fechas de String a Date
+En este punto se hará el cambio de las fechas que se obtienen como String y para mostrarlo en el componente es necesario tenerlo modo __Date__.
+
+Pasos a Seguir:
+* Se crea un nuevo helper que hará la transformación de String a tipo Date.
+* Se agregará la nueva función del helper en la acción `eventStartLoading`.
+* Se usa CustomHook useSelector para realizar una modificación en los colores de los eventos.
+
+En `helpers/prepareEvent.js`
+* Se importa moment para que nos ayude con la transformación de las fechas.
+````
+import moment from 'moment';
+````
+* Se crea el helper `prepareEvents` que recibe por parámetro el `events` y por defecto se envía arreglo vacío.
+* Se retorna un `.map()` que utilizando __moment__ se transformará de String a Date las fechas de `start` y `end`.
+````
+export const prepareEvents = ( events = []) => {
+    return events.map(
+        (e) => ({
+            ...e,
+            start: moment( e.start ).toDate(),
+            end: moment( e.end ).toDate(),
+        })
+    );
+}
+````
+En `actions/events.js`
+* Se importa el helper `prepareEvents`.
+````
+...
+import { prepareEvents } from "../helpers/prepareEvent";
+````
+* En la acción asíncrona `eventStartLoading`, utilizamos la función del helper `prepareEvents` pasandole por argumento lo que hay en `body.eventos`.
+* Para luego disparar la acción `eventLoaded` con lo que recibio `events` con las fechas tipo Date.
+````
+const events = prepareEvents(body.eventos);
+
+dispatch( eventLoaded(events) );
+````
+En `components/calendar/CalendarScreen.js`
+* Se utiliza __useSelector__ para buscar el id del usuario que viene en auth.
+````
+const { uid } = useSelector( state => state.auth );
+````
+* En la función `eventStyleGetter` verificamos si el uid que se tiene en el estado global es el mismo que el que creeo el evento `event.user._id`, en el caso que si se pondrá un color celeste, en el caso que sea diferente los ids, sera de color morado el evento.
+````
+const style = {
+  backgroundColor: ( uid === event.user._id ) ? '#367CF7' :  '#9E24FA',
+  borderRadius: '0px',
+  opacity: 0.8,
+  display: 'block',
+  color: 'white'
+}
+````
+----
