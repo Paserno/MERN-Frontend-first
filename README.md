@@ -1801,3 +1801,66 @@ if ( checking ){
 />
 ````
 ----
+### 7.- Logout
+Se creará el reducer de logout y agregarlo al botón.
+
+Pasos a Seguir: 
+* Se crea el case del logout en el Reducer de auth.
+* Se crea 2 acciónes una asíncrona y otra sincrona.
+* Se establece el logout en el botón del componente __Navbar__.
+
+En `reducer/authReducer.js`
+* Se crea el case del logout, en este caso no devolverá el estado si no que el `checking` en false.
+````
+case types.authLogout:
+  return {
+      checking: false
+  }
+````
+* Se crea la acción asíncrona retornando un callback.
+* Se limpla el `localStorage` y se dispará una acción que proximamente se mostrará de logout.
+````
+export const startLogout = () => {
+    return ( dispatch ) => {¿
+        localStorage.clear();
+        dispatch( logout() );
+    }
+}
+````
+* Se crea la acción `logout` que es disparáda en la acción asíncrona.
+````
+const logout = () => ({
+    type: types.authLogout
+});
+````
+En `components/ui/Navbar.js`
+* Se importa 3 nuevos elementos 2 CustomHook de React Redux y la acción `startLogout`.
+````
+import { useDispatch, useSelector } from 'react-redux';
+import { startLogout } from '../../actions/auth';
+````
+* Se busca el estado que esta en Redux `name` para proximamente mostrar el nombre del usuario.
+* Se implementa el useDispatch.
+* Se crea la función `handleLogout` que dispara la acción asíncrona `startLogout`.
+````
+const { name } = useSelector(state => state.auth);
+const dispatch = useDispatch();
+
+const handleLogout = () => {    
+  dispatch( startLogout() );
+}
+````
+* Se agrega el nombre del usuario que se busco en el estado global.
+````
+<span className="navbar-brand">
+  {name}
+</span>
+````
+* Se implementa la función recién creada `handleLogout`.
+````
+<button 
+  className="btn btn-outline-danger"
+  onClick={ handleLogout }
+>
+````
+----
