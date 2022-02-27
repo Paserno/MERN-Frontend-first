@@ -2073,3 +2073,43 @@ const style = {
 }
 ````
 ----
+### 4.- Actualizar Evento en Backend
+En este punto se habilitará la edición de un evento.
+
+Pasos a Seguir: 
+* Creamos una nueva acción asíncrona `eventStartUpdated` para realizar la actualización hacia el backend.
+* Se remplaza la acción `eventUpdated` por la nueva `eventStartUpdated`.
+
+En `actions/events.js`
+* Se crea la acción `eventStartUpdated` asíncrona, que recibe por parámetro el `event`.
+* En la función `fetchConToken` mandamos el path con el id que se recibirá del `event`, ademas de mandar el contenido y el metodo PUT.
+* Luego realizamos una validación, en el caso que sea true `body.ok` se disparará `eventUpdated` con el contenido del evento.
+* En el caso que sea false se enviará un alerta con el mensaje del backend.
+````
+export const eventStartUpdated = ( event ) => {
+    return async( dispatch ) => {
+        try {
+            const resp = await fetchConToken(`events/${ event.id }` , event ,'PUT');
+            const body = await resp.json();
+
+            if( body.ok ){
+                dispatch(eventUpdated( event ));
+            } else {
+                Swal.fire('Error', body.msg, 'error')
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+````
+En ``
+* Se remplaza `eventUpdated` por `eventStartUpdated`.
+````
+import { eventClearActiveEvent, eventStartAddNew, eventStartUpdated } from '../../actions/events';
+````
+* Se remplaza `eventUpdated` por `eventStartUpdated` para disparar la acción asíncrona mandandole por el estado del formulario.
+````
+dispatch( eventStartUpdated( formValues ) );
+````
+----
