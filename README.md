@@ -2191,7 +2191,7 @@ En `components/ui/DeleteEventFab.js`
 ````
 import { eventStartDeleted } from '../../actions/events';
 ````
-* En la función `handleDelete` se dispará la nueva acción `eventStartDeleted` asíncrona.
+* En la función `handleDelete` se dispara la nueva acción `eventStartDeleted` asíncrona.
 ````
 dispatch( eventStartDeleted() );
 ````
