@@ -1864,3 +1864,79 @@ const handleLogout = () => {
 >
 ````
 ----
+# MERN Frontend - CRUD Eventos con Backend
+En este nivel se realizará la integración de los eventos con el backend, para tener la información persistente.
+
+<img src="https://916256.smushcdn.com/2265571/wp-content/uploads/2019/02/0_th2x89zHuZmHGsLJ.png?lossy=1&strip=1&webp=1" alt="CRUD" width="320"/>
+
+----
+### 1.- Creación de evento hacia el backend
+En este punto se creará la acción que permita realizar la creación de eventos hacia el backend, para proximamente mostrarlo.
+
+Pasos a Seguir:
+* Crear un nuevo tipo.
+* Modificar acción sincrona y crear una nueva acción asíncrona.
+* Modificar componente CalendarModal.
+
+En `types/types.js`
+* Se crea un nuevo tipo.
+````
+eventStartAddNew: '[Event] Start Add New',
+````
+En `actions/events.js`
+* Se importa la función del helper `fetchConToken`.
+````
+import { fetchConToken } from "../helpers/fetch";
+````
+* Se crea la nueva acción asíncrona que recibe por parámetro `event`.
+* Se retorna un callback, gracias a Thunk se puede recibir `dispatch` y `getState`.
+* Con el `getState()` se puede buscar elementos en el estado de la aplciación, en este caso desestructuramos `uid` y `name`.
+* Encerramos el contenido en un __TryCatch__ para controlar el error.
+* Mandamos en la función `fetchConToken` el `events` que es el endpoint, event que es el contenido que será recibido en las propiedades y metodo __POST__.
+* Almacenamos el contenido que recibimos en la constante `body`.
+* Realizamos una condición, si el `body.ok` es true, se envia el id, y el user por el `event`.
+* Mandamos en la acción `eventAddNew` el contenido del `event`.
+* En el caso de recibir algun error se imprimirá por consola.
+
+````
+export const eventStartAddNew = (event) => {
+    return async( dispatch, getState ) => {
+        const { uid, name } = getState().auth;
+
+        try {
+            const resp = await fetchConToken('events', event, 'POST');
+            const body = await resp.json();
+
+            if ( body.ok ){
+                event.id = body.evento.id;
+                event.user = {
+                    _id: uid,
+                    name
+                };
+
+                dispatch( eventAddNew(event) )
+            }
+
+        } catch (error) {
+            console.log(error);
+        }   
+    }
+}
+````
+* Esta función le quitamos el `export` ya que se manejará localmente.
+````
+const eventAddNew = (event) => ({
+    type: types.eventAddNew,
+    payload: event
+});
+````
+En ``
+* Remplazamos la importación de `eventAddNew` por la nueva `eventStartAddNew`.
+````
+import { eventClearActiveEvent, eventStartAddNew, eventUpdated } from '../../actions/events';
+````
+* En la función `handleSubmitForm` el ultimo else, se remplaza el contenido que se iba a mandar por la nueva acción `eventStartAddNew` que se le pasa por argumento solamente el estado del formulario.
+````
+dispatch( eventStartAddNew(formValues) );
+````
+----
